@@ -8,7 +8,12 @@ const configure = require("../../wiloke.test.api.json");
 const { axiosDefaults } = configure;
 const testPath = resolve(__dirname, "../../");
 const path = process.argv[2];
-const files = glob.sync(`${testPath}/${path}/**/*.test.api.*`);
+const checkFile =
+  process.argv[3] === "--file" && process.argv[4].includes("test.api.");
+const file = process.argv[4];
+const files = glob.sync(
+  `${testPath}/${path}/**/${checkFile ? file : "*.test.api.*"}`
+);
 let count = 0;
 
 function log(str, color = 36) {
