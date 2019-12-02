@@ -5,8 +5,9 @@ const axios = require("axios");
 const { type, equals } = require("ramda");
 const configure = require("../../wiloke.test.api.json");
 
-const { axiosDefaults, path } = configure;
+const { axiosDefaults } = configure;
 const testPath = resolve(__dirname, "../../");
+const path = process.argv[2];
 const files = glob.sync(`${testPath}/${path}/**/*.test.api.*`);
 let count = 0;
 

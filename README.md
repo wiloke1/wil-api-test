@@ -28,8 +28,7 @@ yarn add wil-api-test --save-dev
   "axiosDefaults": {
     "baseURL": "API base url"
     // https://github.com/axios/axios#global-axios-defaults
-  },
-  "path": "src"
+  }
 }
 ```
 
