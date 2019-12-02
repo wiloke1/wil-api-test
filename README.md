@@ -50,6 +50,6 @@ yarn add wil-api-test --save-dev
 </@expected>
 ```
 
-#### Cli test all files `yarn api-test` or `npm run api-test`
+##### Cli test all files `yarn api-test` or `npm run api-test`
 
-### Cli test only file `yarn api-test --file foo.test.api.js` or `npm run api-test --file foo.test.api.js`
+##### Cli test only file `yarn api-test --file foo.test.api.js` or `npm run api-test --file foo.test.api.js`
