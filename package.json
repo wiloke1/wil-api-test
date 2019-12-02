@@ -2,6 +2,9 @@
   "name": "wil-api-test",
   "version": "1.1.0",
   "main": "index.js",
+  "bin": {
+    "wil-api-test": "./bin/wil-api-test"
+  },
   "scripts": {
     "test": "node index.js"
   },
