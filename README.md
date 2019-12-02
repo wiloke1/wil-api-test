@@ -18,14 +18,17 @@ yarn add wil-api-test --save-dev
 ```js
 "scripts": {
   ...
-  "apitest": "node node_modules/wil-api-test"
+  "api-test": "node node_modules/wil-api-test"
 }
 ```
 
 #### Create file wiloke.test.api.json at the root directory
 ```js
 {
-  "baseUrl": "API base url",
+  "axiosDefaults": {
+    "baseURL": "API base url"
+    // https://github.com/axios/axios#global-axios-defaults
+  },
   "path": "src"
 }
 ```
