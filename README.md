@@ -18,7 +18,7 @@ yarn add wil-api-test --save-dev
 ```js
 "scripts": {
   ...
-  "api-test": "node node_modules/wil-api-test"
+  "api-test": "wil-api-test src"
 }
 ```
 
