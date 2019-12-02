@@ -11,5 +11,4 @@ Object.keys(configure.axiosDefaults).forEach(key => {
   axios.defaults[key] = configure.axiosDefaults[key];
 });
 
-process.stdin.resume();
-process.stdin.on("end", () => server.listen(PORT, initial));
+server.listen(PORT, initial);
