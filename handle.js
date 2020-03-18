@@ -3,41 +3,40 @@ const { resolve } = require("path");
 const glob = require("glob");
 const axios = require("axios");
 const { type, equals } = require("ramda");
-const configure = require("../../wiloke.test.api.json");
 
-const { axiosDefaults } = configure;
 const testPath = resolve(__dirname, "../../");
 const path = process.argv[2];
-const checkFile =
-  process.argv[3] === "--file" && process.argv[4].includes("test.api.");
-const file = process.argv[4];
-const files = glob.sync(
-  `${testPath}/${path}/**/${checkFile ? file : "*.test.api.*"}`
-);
+const file =
+  (process.argv[3] === "--file" && process.argv[4].includes("test.api.")
+    ? process.argv[4]
+    : "*.test.api.*") ||
+  (process.argv[5] === "--file" && process.argv[6].includes("test.api.")
+    ? process.argv[4]
+    : "*.test.api.*");
+const baseURL =
+  (process.argv[3] === "--baseURL" && process.argv[4].includes("http")
+    ? process.argv[4]
+    : "") ||
+  (process.argv[5] === "--baseURL" && process.argv[6].includes("http")
+    ? process.argv[4]
+    : "");
+const files = glob.sync(`${testPath}/${path}/**/${file}`);
 let count = 0;
+
+axios.defaults.baseURL = baseURL;
 
 function log(str, color = 36) {
   return console.log(`\x1b[${color}m${str}\x1b[0m`);
 }
 
-function getAPI(content) {
-  const contentMatch = content.match(/getData\(.*\)/g);
-  if (!contentMatch) {
-    return "";
-  }
-  return content
-    .match(/getData\(.*\)/g)[0]
-    .replace(/getData\(("|')|("|')\)/g, "");
-}
-
-function getJs(content) {
+function getJsReceived(content) {
   return content
     .match(/<@received>.*([\s\S]*?)<\/@received>/g)[0]
     .replace(/<(\/|)@received>/g, "");
 }
 
 function handleArr(value) {
-  return value.map(item => {
+  return [value[0]].map(item => {
     if (type(item) === "Object") {
       return handleReplaceValueToTypeof(item);
     }
@@ -85,16 +84,23 @@ function getData(content) {
   return handleReplaceValueToTypeof(data);
 }
 
-async function handleFetchAPI(api, js, expected, file) {
-  const apiLog = api.includes("http") ? api : `${axiosDefaults.baseURL}${api}`;
+async function handleFetchAPI(jsReceived, expected, file) {
+  const url = jsReceived
+    .match(/axios\.get\(.*("|')/g)[0]
+    .replace(/axios\.get\(|"|'/g, "");
   const divider = `____________________________________________________________________________________`;
   try {
-    const { data } = await axios.get(api);
     const getReceived = new Function(
-      "input",
-      `const getData = () => input;${js}`
+      "axios",
+      `
+      const result = async () => {
+        ${jsReceived}
+      };
+      return result();
+    `
     );
-    const received = handleReplaceValueToTypeof(getReceived(data));
+    const response = await getReceived(axios);
+    const received = handleReplaceValueToTypeof(response);
     const isEqual = equals(expected, received);
     log(
       `${!count ? `${divider}\n\n` : ""} ${isEqual ? "✔" : "✘"}  ${file.replace(
@@ -102,7 +108,7 @@ async function handleFetchAPI(api, js, expected, file) {
         ""
       )} ${
         isEqual ? "[success]" : "[wrong data structure]"
-      }: ${apiLog}\n${divider}\n`,
+      }: ${url}\n${divider}\n`,
       isEqual ? 32 : 31
     );
     // if (!isEqual) {
@@ -114,7 +120,8 @@ async function handleFetchAPI(api, js, expected, file) {
       `${!count ? `${divider}\n\n` : ""} ✘  ${file.replace(
         /.*(\/|\\)/g,
         ""
-      )} [api error]: ${apiLog}\n\n ${err}\n${divider}\n`,
+      )} [api error]: ${err.request.responseURL ||
+        url}\n\n ${err}\n${divider}\n`,
       31
     );
   } finally {
@@ -130,10 +137,9 @@ function initial() {
   files.forEach((file, index) => {
     fs.readFile(file, "utf8", (err, content) => {
       if (err) throw err;
-      const api = getAPI(content);
-      const js = getJs(content);
+      const jsReceived = getJsReceived(content);
       const expected = getData(content);
-      handleFetchAPI(api, js, expected, file);
+      handleFetchAPI(jsReceived, expected, file);
     });
   });
 }

@@ -18,24 +18,15 @@ yarn add wil-api-test --save-dev
 ```js
 "scripts": {
   ...
-  "api-test": "wil-api-test src"
-}
-```
-
-#### Create file wiloke.test.api.json at the root directory
-```js
-{
-  "axiosDefaults": {
-    "baseURL": "API base url"
-    // https://github.com/axios/axios#global-axios-defaults
-  }
+  "api-test": "wil-api-test src --baseURL axios_base_url"
 }
 ```
 
 #### Create file testing: example foo.test.api.js
 ```js
 <@received>
-  const data = getData("API ENDPOINT OR URL");
+  // using axios ( not import )
+  const { data } = axios.get("API ENDPOINT OR URL");
   const result = data[0];
   return result;
 </@received>

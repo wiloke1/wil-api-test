@@ -1,5 +1,5 @@
 <@received>
-  const data = getData("https://5abe1d53d4c5900014949e9c.mockapi.io/api/articles");
+  const { data } = await axios.get("https://5abe1d53d4c5900014949e9c.mockapi.io/api/articles");
   const result = data[0];
   return result;
 </@received>
