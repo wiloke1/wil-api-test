@@ -1,6 +1,6 @@
 {
   "name": "wil-api-test",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "main": "index.js",
   "bin": {
     "wil-api-test": "./bin/wil-api-test"
